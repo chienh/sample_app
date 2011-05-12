@@ -64,6 +64,14 @@ describe UsersController do
       get :show, :id => @user
       response.should have_selector("h1>img", :class => "gravatar")
     end
+
+    it "should show the user's microposts" do
+      mp1 = Factory(:micropost, :user => @user, :content => "Foo bar")
+      mp2 = Factory(:micropost, :user => @user, :content => "Baz quux")
+      get :show, :id => @user
+      response.should have_selector("span.content", :content => mp1.content)
+      response.should have_selector("span.content", :content => mp2.content)
+    end
   end
 
   describe "POST 'create'" do
@@ -341,7 +349,7 @@ describe UsersController do
         end.should_not change(User, :count)
       end
 
-      it "should not have 'delete' links" do
+      it "should have 'delete' links" do
         get :index
         response.should have_selector("a", :href => "/users/#{@user.id}",
                                            :content => "delete")
